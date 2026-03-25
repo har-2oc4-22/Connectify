@@ -14,7 +14,7 @@ import { serverUrl } from '../main';
 import { setMessages } from '../redux/messageSlice';
 
 function MessageArea() {
-  let { selectedUser, userData, socket } = useSelector(state => state.user)
+  let { selectedUser, userData, socket, onlineUsers } = useSelector(state => state.user)
   let dispatch = useDispatch()
   let [showPicker, setShowPicker] = useState(false)
   let [input, setInput] = useState("")
@@ -85,7 +85,9 @@ function MessageArea() {
               </div>
               <div>
                 <h1 className='text-white font-bold text-base leading-tight'>{selectedUser?.name || selectedUser?.userName || "User"}</h1>
-                <span className='text-xs font-medium' style={{ color: '#06b6d4' }}>● Active now</span>
+                <span className='text-xs font-medium' style={{ color: onlineUsers?.includes(selectedUser?._id) ? '#06b6d4' : 'rgba(255,255,255,0.4)' }}>
+                  {onlineUsers?.includes(selectedUser?._id) ? "● Active now" : "○ Offline"}
+                </span>
               </div>
             </div>
           </div>
@@ -95,11 +97,29 @@ function MessageArea() {
             {/* Subtle grid background pattern */}
             <div className='fixed inset-0 z-0 opacity-[0.03]' style={{ backgroundImage: 'radial-gradient(circle, #7c3aed 1px, transparent 1px)', backgroundSize: '30px 30px', pointerEvents: 'none' }}></div>
 
-            {messages && messages.map((mess) => (
-              mess.sender === userData._id
-                ? <SenderMessage key={mess._id} image={mess.image} message={mess.message} />
-                : <ReceiverMessage key={mess._id} image={mess.image} message={mess.message} />
-            ))}
+            {messages && messages.map((mess, index) => {
+              const currentDate = new Date(mess.createdAt || Date.now());
+              const prevDate = index > 0 ? new Date(messages[index - 1].createdAt || Date.now()) : null;
+              const showDate = index === 0 || currentDate.toDateString() !== prevDate?.toDateString();
+              
+              const isToday = currentDate.toDateString() === new Date().toDateString();
+              const dateLabel = isToday ? "Today" : currentDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+
+              return (
+                <React.Fragment key={mess._id}>
+                  {showDate && (
+                    <div className="flex justify-center my-4 w-full">
+                      <span className="px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide text-white/50 backdrop-blur-md shadow-md border" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)' }}>
+                        {dateLabel}
+                      </span>
+                    </div>
+                  )}
+                  {mess.sender === userData._id
+                    ? <SenderMessage image={mess.image} message={mess.message} createdAt={mess.createdAt} />
+                    : <ReceiverMessage image={mess.image} message={mess.message} createdAt={mess.createdAt} />}
+                </React.Fragment>
+              )
+            })}
             <div className='h-[80px] w-full flex-shrink-0'></div>
             <div ref={messagesEndRef} />
           </div>
