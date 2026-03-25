@@ -20,6 +20,7 @@ function SideBar() {
   const handleLogOut = async () => {
     try {
       await axios.get(`${serverUrl}/api/auth/logout`, { withCredentials: true })
+      localStorage.removeItem('chatify_token');
       dispatch(setUserData(null))
       dispatch(setOtherUsers(null))
       dispatch(setToast({ message: "Logged out successfully", type: "info" }))

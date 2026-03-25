@@ -60,6 +60,7 @@ export const signUp = async (req, res, next) => {
         // Ensure password is not sent back to client
         const safeUser = user.toObject();
         delete safeUser.password;
+        safeUser.token = token;
 
         return res.status(201).json(safeUser)
 
@@ -112,6 +113,7 @@ export const login = async (req, res, next) => {
         // Ensure password is not sent back to client
         const safeUser = user.toObject();
         delete safeUser.password;
+        safeUser.token = token;
 
         return res.status(200).json(safeUser)
 

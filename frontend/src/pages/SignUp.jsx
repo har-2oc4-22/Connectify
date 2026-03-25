@@ -21,6 +21,9 @@ function SignUp() {
         setLoading(true)
         try {
             let result = await axios.post(`${serverUrl}/api/auth/signup`, { userName, email, password }, { withCredentials: true })
+            if (result.data.token) {
+                localStorage.setItem('chatify_token', result.data.token);
+            }
             dispatch(setUserData(result.data))
             dispatch(setToast({ message: "Account created! ✨", type: "success" }))
             navigate("/profile")

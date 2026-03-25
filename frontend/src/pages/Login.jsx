@@ -20,6 +20,9 @@ function Login() {
         setLoading(true)
         try {
             let result = await axios.post(`${serverUrl}/api/auth/login`, { email, password }, { withCredentials: true })
+            if (result.data.token) {
+                localStorage.setItem('chatify_token', result.data.token);
+            }
             dispatch(setUserData(result.data))
             dispatch(setSelectedUser(null))
             dispatch(setToast({ message: "Welcome back! 👋", type: "success" }))
