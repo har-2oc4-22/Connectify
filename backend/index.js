@@ -18,6 +18,9 @@ await connectDb()
 // Security: disable X-Powered-By header
 app.disable('x-powered-by')
 
+// Trust proxy required for secure cookies behind Render's load balancer
+app.set('trust proxy', 1);
+
 // Removed express-mongo-sanitize because it's incompatible with Express 5 getters
 
 // CORS must be BEFORE rate limiter and routes

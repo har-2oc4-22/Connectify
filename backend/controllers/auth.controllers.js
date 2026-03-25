@@ -49,11 +49,12 @@ export const signUp = async (req, res, next) => {
 
         const token = await genToken(user._id)
 
+        const isProduction = process.env.NODE_ENV === "production" || process.env.CLIENT_URL?.startsWith('https') || process.env.RENDER;
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
-            secure: process.env.NODE_ENV === "production"
+            sameSite: isProduction ? "None" : "Strict",
+            secure: !!isProduction
         })
 
         // Ensure password is not sent back to client
@@ -100,11 +101,12 @@ export const login = async (req, res, next) => {
 
         const token = await genToken(user._id)
 
+        const isProduction = process.env.NODE_ENV === "production" || process.env.CLIENT_URL?.startsWith('https') || process.env.RENDER;
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
-            secure: process.env.NODE_ENV === "production"
+            sameSite: isProduction ? "None" : "Strict",
+            secure: !!isProduction
         })
 
         // Ensure password is not sent back to client
@@ -125,11 +127,12 @@ export const login = async (req, res, next) => {
  */
 export const logOut = async (req, res, next) => {
     try {
+        const isProduction = process.env.NODE_ENV === "production" || process.env.CLIENT_URL?.startsWith('https') || process.env.RENDER;
         res.cookie("token", "", {
             httpOnly: true,
             expires: new Date(0),
-            sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
-            secure: process.env.NODE_ENV === "production"
+            sameSite: isProduction ? "None" : "Strict",
+            secure: !!isProduction
         });
         return res.status(200).json({ message: "Logged out successfully" })
     } catch (error) {
