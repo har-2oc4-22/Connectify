@@ -30,6 +30,13 @@ export const sendMessage = async (req, res, next) => {
         let image;
         if (req.file) {
             image = await uploadOnCloudinary(req.file.path)
+            
+            // If image was provided but upload failed, don't proceed to create message
+            if (!image) {
+                const error = new Error("Failed to upload image. Please try again.");
+                error.statusCode = 500;
+                return next(error);
+            }
         }
 
         let conversation = await Conversation.findOne({
